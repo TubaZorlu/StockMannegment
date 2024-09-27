@@ -1,0 +1,225 @@
+﻿@{
+    ViewData["Title"] = "StockReport";
+    Layout = "~/Views/Shared/_SMLayout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Charts - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+          name="viewport" />
+    <link rel="icon" href="~/kaiadmin-lite-1.2.0/assets/img/kaiadmin/favicon.ico"
+          type="image/x-icon" />
+
+    <!-- Fonts and icons -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: { families: ["Public Sans:300,400,500,600,700"] },
+            custom: {
+                families: [
+                    "Font Awesome 5 Solid",
+                    "Font Awesome 5 Regular",
+                    "Font Awesome 5 Brands",
+                    "simple-line-icons",
+                ],
+                urls: ["../assets/css/fonts.min.css"],
+            },
+            active: function () {
+                sessionStorage.fonts = true;
+            },
+        });
+    </script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/plugins.min.css" />
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/kaiadmin.min.css" />
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/demo.css" />
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="page-inner" style="padding-top:100px;">
+                <h3 class="fw-bold mb-3"></h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="card-title">Ürünlere Göre Stok Çıkış Durmu</div>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Ürünler
+                                    </button>
+                                    <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
+                                        <input type="text" class="form-control mb-3" id="dropdownSearch" placeholder="Ürün ara...">
+                                        <div id="dropdownItems" style="max-height: 200px; overflow-y: auto;">
+                                            @foreach (var item in ViewBag.Products)
+                                            {
+                                                <a href="#" class="dropdown-item" onclick="submitData('product','@item.ID')">@item.ProductName</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 400px;">
+                                    <canvas id="lineChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="card-title">Kategorilire Göre Stok Çıkış Durumu</div>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Kategoriler
+                                    </button>
+                                    <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
+                                        <input type="text" class="form-control mb-3" id="dropdownSearch" placeholder="Kategori ara...">
+                                        <div id="dropdownItems" style="max-height: 200px; overflow-y: auto;">
+                                            @foreach (var item in ViewBag.Categories)
+                                            {
+                                                <a href="#" class="dropdown-item" onclick="submitData('category','@item.ID')">@item.CategoryName</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 400px;">
+                                    <canvas id="barChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        var myLineChart = new Chart(document.getElementById("lineChart"), {
+            type: "line",
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: "Ürün Seçiniz",
+                    borderColor: "#1d7af3",
+                    backgroundColor: "transparent",
+                    data: [],
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: { labels: { fontSize: 14, fontColor: "#000" } },
+                scales: {
+                    yAxes: [{ ticks: { fontSize: 14, fontColor: "#000", beginAtZero: true } }],
+                    xAxes: [{ ticks: { fontSize: 14, fontColor: "#000" } }],
+                },
+            }
+        });
+
+        var myBarChart = new Chart(document.getElementById("barChart"), {
+            type: "bar",
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: "Kategori Seçiniz",
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: [],
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{ ticks: { beginAtZero: true } }]
+                }
+            }
+        });
+
+        function submitData(type, id) {
+            let dataToSend = {};
+
+            if (type === 'product') {
+                dataToSend = { productId: id };
+            } else if (type === 'category') {
+                dataToSend = { categoryId: id };
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("StockReport", "StockMovement")',
+                data: dataToSend,
+                success: function (response) {
+                    if (type === 'product') {
+                        updateLineChart(response.stockData);
+                    } else if (type === 'category') {
+                        updateBarChart(response.salesData);
+                    }
+                },
+                error: function (error) {
+                    console.log("Error:", error);
+                }
+            });
+        }
+
+        function updateLineChart(stockData) {
+            var labels = [];
+            var data = [];
+            var productName = stockData[0].productName;
+
+            stockData.forEach(function (item) {
+                labels.push(getMonthName(item.month));
+                data.push(item.totalExit);
+            });
+
+            myLineChart.data.labels = labels;
+            myLineChart.data.datasets[0].data = data;
+            myLineChart.data.datasets[0].label = productName;
+            myLineChart.update();
+        }
+
+        function updateBarChart(salesData) {
+            var labels = [];
+            var data = [];
+            var categoryName = salesData[0].categoryName;
+
+            salesData.forEach(function (item) {
+                labels.push(getMonthName(item.month));
+                data.push(item.totalExit);
+            });
+
+            myBarChart.data.labels = labels;
+            myBarChart.data.datasets[0].data = data;
+            myBarChart.data.datasets[0].label = categoryName;
+            myBarChart.update();
+        }
+
+        function getMonthName(monthNumber) {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return months[monthNumber - 1];
+        }
+
+    </script>
+</body>
+</html>

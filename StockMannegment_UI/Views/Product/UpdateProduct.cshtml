@@ -1,0 +1,264 @@
+﻿@model StockMannegment_Dtos.ProductDtos.UpdateProductDto
+@{
+    ViewData["Title"] = "AddProduct";
+    Layout = "~/Views/Shared/_SMLayout.cshtml";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Forms - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+          name="viewport" />
+    <link rel="icon"
+          href="../assets/img/kaiadmin/favicon.ico"
+          type="image/x-icon" />
+
+    <!-- Fonts and icons -->
+    <script src="../assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+          google: { families: ["Public Sans:300,400,500,600,700"] },
+          custom: {
+            families: [
+              "Font Awesome 5 Solid",
+              "Font Awesome 5 Regular",
+              "Font Awesome 5 Brands",
+              "simple-line-icons",
+            ],
+            urls: ["../assets/css/fonts.min.css"],
+          },
+          active: function () {
+            sessionStorage.fonts = true;
+          },
+        });
+    </script>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../assets/css/plugins.min.css" />
+    <link rel="stylesheet" href="../assets/css/kaiadmin.min.css" />
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="../assets/css/demo.css" />
+</head>
+<body>
+    <div class="wrapper">
+
+        <div class="container">
+            <div class="page-inner">
+                <div class="page-header">
+                    <h3 class="fw-bold mb-3">Forms</h3>
+                    <ul class="breadcrumbs mb-3">
+                        <li class="nav-home">
+                            <a href="#">
+                                <i class="icon-home"></i>
+                            </a>
+                        </li>
+                        <li class="separator">
+                            <i class="icon-arrow-right"></i>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Forms</a>
+                        </li>
+                        <li class="separator">
+                            <i class="icon-arrow-right"></i>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#">Basic Form</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+
+
+                        <form method="post" action="/Product/UpdateProduct">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">Ürün Güncelleme ekranı</div>
+                                </div>
+
+                                <div class="card-body">
+                                    <div class="row">
+                                        <!-- Sol Kolon: Ürün Adı ve Kategori -->
+                                        <div class="col-12 col-lg-6">
+                                            <!-- Ürün Adı -->
+                                            <input type="hidden" name="ID" value="@Model.ID" />
+                                            <input type="hidden" name="CurrentQuantity" value="@Model.CurrentStock" />
+                                            <div class="form-group">
+                                                <label for="productName" style="font-weight:bold">Ürün Adı</label>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       id="productName"
+                                                       name="ProductName"
+                                                       value="@Model.ProductName"
+                                                       placeholder="Ürünün adını giriniz"
+                                                       required />
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="productName">Stok Uyarı Adeti</label>
+                                                <input type="number"
+                                                       class="form-control"
+                                                       id="WarningQuantity"
+                                                       name="WarningQuantity"
+                                                       value="@Model.WarningQuantity"
+                                                       placeholder="Stok Uyarı Adetini Giriniz"
+                                                       required />
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label for="categoryId" style="font-weight:bold">Durumu</label>
+                                                <select class="form-select form-control"
+                                                        id="status"
+                                                        name="Status"
+                                                        required>
+                                                    @if (Model.Status == 0)
+                                                    {
+                                                        <option value="0" selected>Pasif</option>
+                                                        <option value="1">Aktif</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="1" selected>Aktif</option>
+                                                        <option value="0">Pasif</option>
+                                                    }
+
+
+
+
+
+                                                </select>
+                                            </div>
+                                           
+                                           <div class="form-group">
+                                            <label for="categoryId" style="font-weight:bold">Kategori Seçiniz</label>
+                                            <select asp-for="CategoryID" asp-items="ViewBag.Category" class="form-control"></select>
+
+
+                                            </div>
+                                   
+                                        </div>
+
+                                        <div class="col-12 col-lg-6">
+                                            <!-- Beden Seçimi -->
+
+                                            <div class="form-group">
+                                                <label for="categoryId" style="font-weight:bold">Kategori Seçiniz</label>
+                                                <select asp-for="SizeID" asp-items="ViewBag.Size" class="form-control"></select>
+
+
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="categoryId" style="font-weight:bold">Kategori Seçiniz</label>
+                                                <select asp-for="GenderID" asp-items="ViewBag.Gender" class="form-control"></select>
+
+
+                                            </div>
+                                            <!-- Açıklama -->
+                                            <!-- Açıklama -->
+                                            <div class="form-group">
+                                                <label for="description" style="font-weight:bold">Açıklama</label>
+                                                <textarea class="form-control form-control-lg"
+                                                          id="description"
+                                                          name="Description"
+                                                          rows="5"
+                                                          required
+                                                          placeholder="Açıklama Giriniz">@Model.Description
+                                                          </textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card-action">
+                                    <button type="submit" class="btn btn-success">Güncelle</button>
+                                </div>
+                            </div>
+                        </form>
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div id="successMessage" class="alert alert-success">
+                                @TempData["SuccessMessage"]
+                            </div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div id="errorMessage" class="alert alert-danger">
+                                @TempData["ErrorMessage"]
+                            </div>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <!--   Core JS Files   -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/core/jquery-3.7.1.min.js"></script>
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/core/popper.min.js"></script>
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/core/bootstrap.min.js"></script>
+
+    <!-- jQuery Scrollbar -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+
+    <!-- Chart JS -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/chart.js/chart.min.js"></script>
+
+    <!-- jQuery Sparkline -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js"></script>
+
+    <!-- Chart Circle -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/chart-circle/circles.min.js"></script>
+
+    <!-- Datatables -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/datatables/datatables.min.js"></script>
+
+    <!-- Bootstrap Notify -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js"></script>
+
+    <!-- jQuery Vector Maps -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/jsvectormap/jsvectormap.min.js"></script>
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/jsvectormap/world.js"></script>
+
+    <!-- Google Maps Plugin -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/gmaps/gmaps.js"></script>
+
+    <!-- Sweet Alert -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/sweetalert/sweetalert.min.js"></script>
+
+    <!-- Kaiadmin JS -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/kaiadmin.min.js"></script>
+
+    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/setting-demo2.js"></script>
+    <script>
+        // Sayfa yüklendiğinde çalışacak
+        window.onload = function() {
+            // Başarı mesajı varsa 3 saniye sonra gizle
+            var successMessage = document.getElementById("successMessage");
+            if (successMessage) {
+                setTimeout(function() {
+                    successMessage.style.display = "none";
+                }, 3000); // 3000 ms = 3 saniye
+            }
+
+            // Hata mesajı varsa 3 saniye sonra gizle
+            var errorMessage = document.getElementById("errorMessage");
+            if (errorMessage) {
+                setTimeout(function() {
+                    errorMessage.style.display = "none";
+                }, 3000); // 3000 ms = 3 saniye
+            }
+        };
+    </script>
+
+</body>
+</html>
+

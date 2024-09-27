@@ -1,0 +1,60 @@
+﻿@using StockMannegment_Dtos.StockMovementDtos
+@model List<AllStockMovementDto>
+      
+@{
+                                        var rowIndex = 1; // Sayaç tanımlandı
+                                    }
+
+@foreach (var item in Model)
+   {
+        <tr>
+                                            <td>@rowIndex</td> <!-- Sıra numarası yazdırılıyor -->
+                                            <td>@item.ProductName</td>
+                                            <td>@item.Size</td>
+                                         
+                                            <td>
+                                                @if (item.Status == 0)
+                                                {
+                                                    <span class="badge badge-secondary" style="font-size: 1rem;">Pasif</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-success" style="font-size: 1rem;">Aktif</span>
+                                                }
+                                            </td>
+                                            <td>
+                                               @item.TotalEntryQuantity @item.UnitName 
+                                            </td>
+                                            <td>
+                                                @item.LastEntryDate.ToString("dd/MM/yyyy")
+                                            </td>
+                                           
+                                            <td>
+                                                <!-- Popup Göster -->
+                                                <a href="javascript:void(0);" onclick="togglePopup(@item.ProductId);">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+
+                                                <!-- Popup İçeriği -->
+                                                <div id="popup-@item.ProductId" class="popup-box" style="text-align:center; display:none;">
+                                                    <h5>@item.ProductName</h5>
+                                                    <h6>Kritik Seviye</h6>
+                                                    <p>@item.WarningQuantity @item.UnitName</p>
+                                                    <h6>Güncel Adet</h6>
+                                                    <p>@item.CurrentStock @item.UnitName</p>
+                                                    
+                                                    <button onclick="closePopup(@item.ProductId)">Kapat</button>
+                                                </div>
+                                            </td>
+                                            <td>
+                                              <a href="#" class="btn btn-outline-warning" onclick="openStockModal(@item.ProductId)">Ekle</a>
+
+                                            </td>
+                                            <td>
+                                                 <a class="btn btn-outline-danger" href="#" onclick="openDecreaseStockModal(@item.ProductId)">Düş</a>
+                                            </td>
+                                        </tr>
+        rowIndex++;
+                                        
+   }
+

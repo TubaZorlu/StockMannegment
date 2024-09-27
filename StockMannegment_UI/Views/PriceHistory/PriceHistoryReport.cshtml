@@ -1,0 +1,308 @@
+﻿@using StockMannegment_Dtos.ProductPriceDtos
+
+@model List<ProductPriceHistoryDto>
+@{
+    ViewData["Title"] = "PriceHistoryReport";
+    Layout = "~/Views/Shared/_SMLayout.cshtml";
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Charts - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+          name="viewport" />
+    <link rel="icon" href="~/kaiadmin-lite-1.2.0/assets/img/kaiadmin/favicon.ico"
+          type="image/x-icon" />
+
+    <!-- Fonts and icons -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: { families: ["Public Sans:300,400,500,600,700"] },
+            custom: {
+                families: [
+                    "Font Awesome 5 Solid",
+                    "Font Awesome 5 Regular",
+                    "Font Awesome 5 Brands",
+                    "simple-line-icons",
+                ],
+                urls: ["../assets/css/fonts.min.css"],
+            },
+            active: function () {
+                sessionStorage.fonts = true;
+            },
+        });
+    </script>
+
+       <style>
+
+        
+
+
+        td {
+            position: relative;
+        }
+
+
+      
+        .card-body {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .table thead {
+                position: sticky;
+                top: 0;
+                background-color: #f1f1f1;
+            }
+
+            .table th, .table td {
+                padding: 10px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+
+                .table td th {
+                    text-align: center;
+                    vertical-align: middle;
+                }
+
+
+        td a i {
+            font-size: 20px;
+            margin-left: 50px;
+        }
+    </style>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/plugins.min.css" />
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/kaiadmin.min.css" />
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/demo.css" />
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="page-inner" style="padding-top:100px;">
+                <h3 class="fw-bold mb-3"></h3>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between">
+                                <div class="card-title">Ürünlerin Yıl İçersinde ki Satış Fiyatları</div>
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Ürünler
+                                    </button>
+                                    <div class="dropdown-menu p-3" aria-labelledby="dropdownMenuButton">
+                                        <input type="text" class="form-control mb-3" id="dropdownSearch" placeholder="Ürün ara...">
+                                        <div id="dropdownItems" style="max-height: 200px; overflow-y: auto;">
+                                            @foreach (var item in ViewBag.Products)
+                                            {
+                                                <a href="#" class="dropdown-item" onclick="submitData('product','@item.ID')">@item.ProductName</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 400px;">
+                                    <canvas id="lineChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Ürünlerin Yıl İçerisindeki Ortalama Fiyat Tarihçesi</div>
+                        </div>
+                        <div class="card-body">
+
+
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Sıra No</th> <!-- Sıra numarası eklenen başlık -->
+                                        <th scope="col">Ürün</th>
+                                        <th scope="col">Kategori</th>
+                                        <th scope="col">Toplam Gelen Stok</th>
+                                        <th scope="col">Toplam Çıkan Stok</th>
+                                        <th scope="col">Ortalama Satış Fiyatı</th>
+                                        <th scope="col">Ortalama Maliyet</th>
+                                        <th scope="col">ToplamKarZarar</th>
+                                        
+                                    </tr>
+                                </thead>
+                                <tbody id="productTableBody">
+                                    @{
+                                        var rowIndex = 1; // Sayaç tanımlandı
+                                    }
+                                   @foreach (var item in Model)
+                                            {
+                                                <tr>
+                                                    <td>@rowIndex</td> <!-- Sıra numarası yazdırılıyor -->
+                                                    <td>@item.ProductName</td>
+                                                    <td>@item.CategoryName</td>
+                                                    <td>@item.GelenStok</td>
+                                                    <td>@item.ÇıkanStok</td>
+                                                    <td>@item.AvgSalesPrice TL</td>
+                                                    <td>@item.AvgCostPrice TL</td>                                            
+                                                    <td>
+                                                        @if (item.ToplamKarZarar <0)
+                                                        {
+                                                            <span class="badge badge-danger" style="font-size: 12px;">@item.ToplamKarZarar TL</span>
+                                                        }
+                                                        else
+                                                        {
+                                                           <span class="badge badge-success" style="font-size: 12px;">@item.ToplamKarZarar TL</span>
+                                                        }
+                                                    </td>
+                                                  
+                                                   
+                                                   
+                                                </tr>
+                                                rowIndex++;
+                                                <!-- Sayaç artırılıyor -->
+                                            }
+                                </tbody>
+                            </table>
+
+
+
+
+
+
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        var myLineChart = new Chart(document.getElementById("lineChart"), {
+            type: "line",
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: "Ürünler",
+                    borderColor: "#1d7af3",
+                    backgroundColor: "transparent",
+                    data: [],
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: { labels: { fontSize: 14, fontColor: "#000" } },
+                scales: {
+                    yAxes: [{ ticks: { fontSize: 14, fontColor: "#000", beginAtZero: true } }],
+                    xAxes: [{ ticks: { fontSize: 14, fontColor: "#000" } }],
+                },
+            }
+        });
+
+ 
+
+        function submitData(type, id) {
+            let dataToSend = {};
+
+            if (type === 'product') {
+                dataToSend = { productId: id };
+            } else if (type === 'category') {
+                dataToSend = { categoryId: id };
+            }
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("PriceHistoryReport", "PriceHistory")',
+                data: dataToSend,
+                success: function (response) {
+                    
+
+                        console.log(response)
+                        updateLineChart(response.stockData);
+                    
+
+                    
+                   
+
+                },
+                error: function (error) {
+                    console.log("Error:", error);
+                }
+            });
+        }
+
+        function updateLineChart(stockData) {
+            if (!stockData || stockData.length === 0) {
+                console.error("Veri yok veya stockData boş.");
+                return;
+            }
+
+            var labels = []; // Ay isimleri için boş dizi
+            var data = [];   // Fiyatlar için boş dizi
+
+            var productName = stockData[0].productName || "Ürün Adı Yok"; // Ürün adını al, yoksa varsayılan kullan
+
+            stockData.forEach(function (item) {
+                // Gelen veriye göre ay ve fiyatları ekle
+                labels.push(getMonthName(item.month)); // Sadece mevcut ayları ekliyoruz
+                data.push(item.price); // O ayın fiyatını ekliyoruz
+            });
+
+            myLineChart.data.labels = labels; // Sadece gelen veriye ait ayları göster
+            myLineChart.data.datasets[0].data = data; // Gelen fiyat verilerini göster
+            myLineChart.data.datasets[0].label = productName; // Ürün adını grafikte göster
+            myLineChart.update(); // Grafiği güncelle
+        }
+
+        // Ay numarasını ay adına çevirme fonksiyonu
+        function getMonthName(monthNumber) {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return months[monthNumber - 1]; // Ayı isim olarak döndür
+        }
+
+
+      
+
+        function getMonthName(monthNumber) {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            return months[monthNumber - 1];
+        }
+
+    </script>
+</body>
+</html>
+
+

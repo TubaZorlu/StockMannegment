@@ -1,0 +1,515 @@
+﻿@using StockMannegment_Dtos.StockMovementDtos
+@model List<AllStockMovementDto>
+@{
+    ViewData["Title"] = "StockMovementList";
+    Layout = "~/Views/Shared/_SMLayout.cshtml";
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Tables - Kaiadmin Bootstrap 5 Admin Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+          name="viewport" />
+    <link rel="icon"
+          href="../assets/img/kaiadmin/favicon.ico"
+          type="image/x-icon" />
+
+    <!-- Fonts and icons -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+          google: { families: ["Public Sans:300,400,500,600,700"] },
+          custom: {
+            families: [
+              "Font Awesome 5 Solid",
+              "Font Awesome 5 Regular",
+              "Font Awesome 5 Brands",
+              "simple-line-icons",
+            ],
+            urls: ["../assets/css/fonts.min.css"],
+          },
+          active: function () {
+            sessionStorage.fonts = true;
+          },
+        });
+    </script>
+    <style>
+
+        .popup-box {
+            display: none;
+            position: absolute;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 200px;
+        }
+
+
+        .popup-box p {
+            margin: 0;
+            padding-bottom: 10px;
+        }
+
+
+        td {
+            position: relative;
+        }
+
+
+        .popup-box button {
+            background-color: grey;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .popup-box button:hover {
+            background-color: darkgrey;
+        }
+
+        table td th {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+
+        td a i {
+            font-size: 20px;
+            margin-left:50px;
+        }
+
+
+    </style>
+
+    <!-- CSS Files -->
+    <link rel="stylesheet" href=".~/kaiadmin-lite-1.2.0/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/plugins.min.css" />
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/kaiadmin.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="~/kaiadmin-lite-1.2.0/assets/css/demo.css" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+        .card-body {
+            max-height: 900px;
+            overflow-y: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .table thead {
+                position: sticky;
+                top: 0;
+                background-color: #f1f1f1;
+            }
+
+            .table th, .table td {
+                padding: 10px;
+                border: 1px solid #ddd;
+                text-align: left;
+            }
+
+
+                .table td th {
+                    text-align: center;
+                    vertical-align: middle;
+                }
+
+
+        td a i {
+            font-size: 20px;
+            margin-left: 50px;
+        }
+</style>
+</head>
+<body>
+
+
+
+
+    <div class="container">
+        <div class="page-inner">
+            <div class="page-header">
+
+                <ul class="breadcrumbs mb-3">
+                    <li class="nav-home">
+                        <a href="#">
+                            <i class="icon-home"></i>
+                        </a>
+                    </li>
+
+                   
+
+                    
+                   <li>
+                        <form id="filterForm" method="post" action="@Url.Action("StockMovementList", "StockMovement")">
+                            <div class="row col-md-12">
+                                <div class="col-md-4">
+                                    <label for="startDate">Başlangıç Tarihi:</label>
+                                    <input type="date" id="startDate" name="startDate" class="form-control" required />
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="endDate">Bitiş Tarihi:</label>
+                                    <input type="date" id="endDate" name="endDate" class="form-control" required />
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">Filtrele</button>
+                                </div>
+                            </div>
+                        </form>
+                   </li>
+
+                </ul>
+            </div>
+            <div class="row">
+
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Stock Hareketleri</div>
+                        </div>
+                        <!-- Bootstrap Toast mesajı -->
+                        <div class="toast" id="toastMessage" data-delay="5000" style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
+                            <div class="toast-header">
+                                <strong class="mr-auto" id="toastHeader">Bildirim</strong>
+                                <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Kapat">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="toast-body" id="toastBody" >
+                                Mesaj burada görünecek.
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+
+
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Sıra No</th> <!-- Sıra numarası eklenen başlık -->
+                                        <th scope="col">Ürün</th>
+                                        <th scope="col">Beden</th>                                  
+                                        <th scope="col">Durumu</th>
+                                        <th scope="col">Toplam Gelen Stok</th>
+                                        <th scope="col">Son Giriş Tarihi</th>
+                                        <th scope="col">Stok Detayları</th>
+                                        <th scope="col">Stok Ekle</th>
+                                        <th scope="col">Stok Düş</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="stockMovementTable">
+                                    @await Html.PartialAsync("_StockMovementTable", Model)
+                                </tbody>
+                            </table>
+
+
+
+
+
+
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+
+
+        </div>
+    </div>
+
+    <!-- Stok Ekle  -->
+<div class="modal fade" id="stockModal" tabindex="-1" aria-labelledby="stockModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="stockModalLabel">Stok Ekleme</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="stockForm">
+          <div class="mb-3">
+            <label for="quantityInput" class="form-label">Eklenecek Stok Miktarı</label>
+            <input type="number" class="form-control" id="quantityInput" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+        <button type="button" class="btn btn-primary" onclick="submitStock()">Stok Ekle</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+    <!-- Stok Düş  -->
+    <div class="modal fade" id="stockDecreaseModal" tabindex="-1" aria-labelledby="stockDecreaseLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="stockDecreaseLabel">Stok Düş</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="decreaseStockForm">
+                        <div class="mb-3">
+                            <label for="decreaseQuantity" class="form-label">Adet Giriniz</label>
+                            <input type="number" class="form-control" id="decreaseQuantity" min="1" required>
+                        </div>
+                        <input type="hidden" id="decreaseProductId">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                    <button type="button" class="btn btn-primary" onclick="submitDecreaseStock()">Stok Düş</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!--   Core JS Files   -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/core/jquery-3.7.1.min.js"></script>
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/core/popper.min.js"></script>
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/core/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Popper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.6/umd/popper.min.js"></script>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+
+
+
+
+    <!-- jQuery Scrollbar -->
+    <!-- jQuery Kütüphanesi -->
+
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js"></script>
+    <!-- Kaiadmin JS -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/kaiadmin.min.js"></script>
+    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
+    <script src="~/kaiadmin-lite-1.2.0/assets/js/setting-demo2.js"></script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery Kütüphanesi -->
+    <!-- Bootstrap JS Kütüphanesi -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
+    <script>
+        $("#displayNotif").on("click", function () {
+          var placementFrom = $("#notify_placement_from option:selected").val();
+          var placementAlign = $("#notify_placement_align option:selected").val();
+          var state = $("#notify_state option:selected").val();
+          var style = $("#notify_style option:selected").val();
+          var content = {};
+
+          content.message =
+            'Turning standard Bootstrap alerts into "notify" like notifications';
+          content.title = "Bootstrap notify";
+          if (style == "withicon") {
+            content.icon = "fa fa-bell";
+          } else {
+            content.icon = "none";
+          }
+          content.url = "index.html";
+          content.target = "_blank";
+
+          $.notify(content, {
+            type: state,
+            placement: {
+              from: placementFrom,
+              align: placementAlign,
+            },
+            time: 1000,
+          });
+        });
+    </script>
+    <script>
+             function togglePopup(id) {
+
+            document.querySelectorAll('.popup-box').forEach(function(popup) {
+                popup.style.display = 'none';
+            });
+
+
+            var popup = document.getElementById('popup-' + id);
+            if (popup) {
+                popup.style.display = 'block';
+            }
+        }
+
+        function closePopup(id) {
+
+            var popup = document.getElementById('popup-' + id);
+            if (popup) {
+                popup.style.display = 'none';
+            }
+        }
+
+
+    </script>
+    <script>
+        $(document).ready(function() {
+           
+            $("#dropdownSearch").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#dropdownItems a").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+        });
+    </script>
+
+ 
+    <script>
+        $('#filterForm').submit(function (e) {
+            e.preventDefault();
+
+            var startDate = $('#startDate').val();
+            var endDate = $('#endDate').val();
+
+            console.log("Form gönderildi, Start Date: " + startDate + ", End Date: " + endDate);
+
+            $.ajax({
+                url: '@Url.Action("StockMovementList", "StockMovement")',
+                type: 'POST',
+                data: { startDate: startDate, endDate: endDate },
+                success: function (response) {
+                    console.log("AJAX isteği başarılı: ", response);
+                    $('#stockMovementTable').html(response);
+                },
+                error: function (error) {
+                    console.log("AJAX hatası: ", error);
+                    alert("Hata: " + error.responseText);
+                }
+            });
+        });
+
+    </script>
+
+    <script>
+               let selectedProductId;
+
+            function openStockModal(productId) {
+                selectedProductId = productId; 
+                const modal = new bootstrap.Modal(document.getElementById('stockModal'));
+                modal.show();
+            }
+
+            function submitStock() {
+                const quantity = document.getElementById('quantityInput').value;
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("AddStock", "StockMovement")', 
+                    data: { productId: selectedProductId, quantity: quantity },
+                    success: function(response) {
+                    if (response.success) {
+                        // Başarılı durumda yeşil arka plan ve başarı mesajı göster
+                        $('#toastMessage').removeClass('bg-danger').addClass('bg-success');
+                        $('#toastHeader').text('Başarılı');
+                        $('#toastBody').text(response.message || 'Stok başarıyla eklendi.');
+                        $('#toastMessage').toast('show');
+                    }
+                    // Gerekirse sayfayı güncellemek için
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000); // 2 saniye sonra sayfayı yenile
+                },
+                    error: function(error) {
+                        console.log("Error:", error);
+                        alert("Stok eklenirken bir hata oluştu.");
+                    }
+                });
+
+                // Modal'ı kapat
+                const modal = bootstrap.Modal.getInstance(document.getElementById('stockModal'));
+                modal.hide();
+            }
+
+    </script>
+    <script>
+        function openDecreaseStockModal(productId) {
+            $('#decreaseProductId').val(productId);
+            $('#decreaseQuantity').val(''); // Adet giriş alanını sıfırlıyoruz
+            $('#stockDecreaseModal').modal('show'); // Modal'ı aç
+        }
+
+        function submitDecreaseStock() {
+            var productId = $('#decreaseProductId').val();
+            var quantity = $('#decreaseQuantity').val();
+
+            if (quantity > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("DeleteStock", "StockMovement")', // Kontrolör'de yazacağımız action
+                    data: { productId: productId, quantity: quantity },
+                    success: function (response) {
+                        if (response.success) {
+                            $('#stockDecreaseModal').modal('hide'); // Modal'ı kapat
+                            showToast('success', 'Stok başarıyla düşüldü!');
+                            setTimeout(function () {
+                                location.reload(); // Sayfayı güncelle
+                            }, 2000);
+                        } else {
+                            showToast('error', response.message || 'Stok düşülürken bir hata oluştu.');
+                        }
+                    },
+                    error: function () {
+                        showToast('error', 'Stok düşülürken bir hata oluştu.');
+                    }
+                });
+            }
+        }
+
+        function showToast(type, message) {
+            var toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            $('#toastMessage').removeClass('bg-success bg-danger').addClass(toastClass);
+            $('#toastHeader').text(type === 'success' ? 'Başarılı' : 'Hata');
+            $('#toastBody').text(message);
+            $('#toastMessage').toast('show');
+        }
+
+
+    </script>
+
+</body>
+</html>
+
+
+
+
